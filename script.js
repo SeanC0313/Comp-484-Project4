@@ -3,6 +3,8 @@ const testArea = document.querySelector("#test-area");
 let originText = document.querySelector("#origin-text p").innerHTML;
 const resetButton = document.querySelector("#reset");
 const theTimer = document.querySelector(".timer");
+const errorDisplay = document.querySelector("#error-count");
+const wpmDisplay = document.querySelector("#wpm-count");
 
 const textSamples = [
     "Terry Teeter, a teeter-totter teacher, taught her daughter Tara to teeter-totter, but Tara Teeter didn't teeter-totter as Terry Teeter taught her to.",
@@ -15,6 +17,7 @@ const textSamples = [
 let timer = [0, 0, 0];
 let interval;
 let timerRunning = false;
+let errorCount = 0;
 
 // Add leading zero to numbers 9 or below (purely for aesthetics):
 function leadingZero(time) {
@@ -39,11 +42,27 @@ function runTimer() {
     }
 }
 
+// Calculate and display WPM:
+function calculateWPM() {
+    let totalCharacters = testArea.value.length;
+    let totalSeconds = (timer[0] * 60) + timer[1] + (timer[2] / 100);
+
+    if (totalSeconds > 0) {
+        let wpm = Math.round((totalCharacters / 5) / (totalSeconds / 60));
+        wpmDisplay.innerHTML = wpm;
+    }
+    else {
+        wpmDisplay.innerHTML = 0;
+    }
+}
+
 // Match the text entered with the provided text on the page:
 function spellCheck() {
     let textEntered = testArea.value;
     let originTextMatch = originText.substring(0, textEntered.length);
     
+    calculateWPM();
+
     if (textEntered === originText) {
         clearInterval(interval);
         testWrapper.style.borderColor = "green";
@@ -54,6 +73,8 @@ function spellCheck() {
         }
         else {
             testWrapper.style.borderColor = "red";
+            errorCount++;
+            errorDisplay.innerHTML = errorCount;
         }
     }
 }
@@ -79,10 +100,14 @@ function reset() {
     interval = null;
     timer = [0, 0, 0];
     timerRunning = false;
+    errorCount = 0;
 
     testArea.value = "";
     theTimer.innerHTML = "00:00:00";
     testWrapper.style.borderColor = "grey";
+    errorDisplay.innerHTML = errorCount;
+    wpmDisplay.innerHTML = 0;
+
     loadNewText();
 }
 
