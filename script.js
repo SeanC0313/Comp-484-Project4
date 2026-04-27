@@ -1,8 +1,16 @@
 const testWrapper = document.querySelector(".test-wrapper");
 const testArea = document.querySelector("#test-area");
-const originText = document.querySelector("#origin-text p").innerHTML;
+let originText = document.querySelector("#origin-text p").innerHTML;
 const resetButton = document.querySelector("#reset");
 const theTimer = document.querySelector(".timer");
+
+const textSamples = [
+    "Terry Teeter, a teeter-totter teacher, taught her daughter Tara to teeter-totter, but Tara Teeter didn't teeter-totter as Terry Teeter taught her to.",
+    "How much wood would a woodchuck chuck if a woodchuck could chuck wood? If a woodchuck could chuck wood, he would chuck as much wood as a woodchuck would if a woodchuck could chuck wood.",
+    "Peter Piper picked a peck of pickled peppers. A peck of pickled peppers Peter Piper picked. If Peter Piper picked a peck of pickled peppers, where's the peck of pickled peppers Peter Piper picked?",
+    "Betty Botter bought some butter, but she said the butter's bitter. If I put it in my batter, it will make my batter bitter, but a bit of better butter will make my batter better. So 'twas better Betty Botter bought a bit of better butter.",
+    "Sally Shore sells seashells by the seashore. The shells she sells are surely seashells. So if she sells shells on the seashore, I'm sure she sells seashore shells."
+];
 
 let timer = [0, 0, 0];
 let interval;
@@ -59,6 +67,12 @@ function start() {
     }
 }
 
+// Load a new text sample:
+function loadNewText() {
+    let randomIndex = Math.floor(Math.random() * textSamples.length);
+    originText = textSamples[randomIndex];
+    document.querySelector("#origin-text p").innerHTML = originText;
+}
 // Reset everything:
 function reset() {
     clearInterval(interval);
@@ -69,6 +83,7 @@ function reset() {
     testArea.value = "";
     theTimer.innerHTML = "00:00:00";
     testWrapper.style.borderColor = "grey";
+    loadNewText();
 }
 
 // Event listeners for keyboard input and the reset button:
