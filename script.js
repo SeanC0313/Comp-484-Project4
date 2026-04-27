@@ -35,7 +35,13 @@ function runTimer() {
 
 
 // Start the timer:
-
+function start() {
+    let textEnteredLength = testArea.value.length;
+    if (textEnteredLength === 0 && !timerRunning) {
+        timerRunning = true;
+        interval = setInterval(runTimer, 10);
+    }
+}
 
 // Reset everything:
 
