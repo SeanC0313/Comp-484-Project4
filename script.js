@@ -5,6 +5,7 @@ const resetButton = document.querySelector("#reset");
 const theTimer = document.querySelector(".timer");
 const errorDisplay = document.querySelector("#error-count");
 const wpmDisplay = document.querySelector("#wpm-count");
+const scoreList = document.querySelector("#score-list");
 
 const textSamples = [
     "Terry Teeter, a teeter-totter teacher, taught her daughter Tara to teeter-totter, but Tara Teeter didn't teeter-totter as Terry Teeter taught her to.",
@@ -18,6 +19,7 @@ let timer = [0, 0, 0];
 let interval;
 let timerRunning = false;
 let errorCount = 0;
+let testComplete = false;
 
 // Add leading zero to numbers 9 or below (purely for aesthetics):
 function leadingZero(time) {
@@ -63,9 +65,11 @@ function spellCheck() {
     
     calculateWPM();
 
-    if (textEntered === originText) {
+    if (textEntered === originText && !testComplete) {
         clearInterval(interval);
         testWrapper.style.borderColor = "green";
+        testComplete = true;
+        saveScore();
     }
     else {
         if (textEntered === originTextMatch) {
@@ -88,6 +92,44 @@ function start() {
     }
 }
 
+// Convert timer to seconds
+function timerToSeconds() {
+    return (timer[0] * 60) + timer[1] + (timer[2] / 100);
+}
+
+//Saving scores
+function saveScore() {
+    let currentTime = timerToSeconds();
+    let scores = JSON.parse(localStorage.getItem("topScores")) || [];
+    
+    scores.push(currentTime);
+    scores.sort(function(a, b) {
+        return a - b;
+    });
+    scores = scores.slice(0, 3);
+    localStorage.setItem("topScores", JSON.stringify(scores));
+    displayScores();
+}
+
+// Display saved scores
+function displayScores() {
+    let scores = JSON.parse(localStorage.getItem("topScores")) || [];
+
+    scoreList.innerHTML = "";
+
+    for (let i = 0; i < 3; i++) {
+        let listItem = document.createElement("li");
+
+        if (scores[i] !== undefined) {
+            listItem.textContent = scores[i].toFixed(2) + "seconds";
+        }
+        else {
+            listItem.textContent = "--";
+        }
+        scoreList.appendChild(listItem);
+    }
+}
+
 // Load a new text sample:
 function loadNewText() {
     let randomIndex = Math.floor(Math.random() * textSamples.length);
@@ -107,6 +149,7 @@ function reset() {
     testWrapper.style.borderColor = "grey";
     errorDisplay.innerHTML = errorCount;
     wpmDisplay.innerHTML = 0;
+    testComplete = false;
 
     loadNewText();
 }
@@ -115,3 +158,6 @@ function reset() {
 testArea.addEventListener("keypress", start);
 testArea.addEventListener("keyup", spellCheck);
 resetButton.addEventListener("click", reset);
+
+displayScores();
+loadNewText();
